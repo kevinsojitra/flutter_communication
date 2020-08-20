@@ -11,15 +11,17 @@ class MyProgressDialog {
 
   MyProgressDialog(this.context);
 
-  void show() {
-    new Future.delayed(const Duration(milliseconds: 100), () {
-      showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext bc) {
-            return CustomDialog(MyProgressIndicator());
-          });
-    });
+  void show(bool b) {
+   if(b){
+     new Future.delayed(const Duration(milliseconds: 100), () {
+       showDialog(
+           barrierDismissible: false,
+           context: context,
+           builder: (BuildContext bc) {
+             return CustomDialog(MyProgressIndicator());
+           });
+     });
+   }
 
   }
 

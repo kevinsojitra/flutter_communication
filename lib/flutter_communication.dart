@@ -19,18 +19,22 @@ class Communication {
     _dialog = MyProgressDialog(context);
   }
 
-  Post(String url, Map<String, String> param, Object object) async {
-    _dialog.show();
-
-
+  Post(String url, Map<String, String> param, Object object,
+      {bool showProgress = true, token = ""}) async {
+    _dialog.show(showProgress);
 
     var request = new http.Request("POST", Uri.parse(url));
     request.bodyFields = param;
+    request.headers.addAll({
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    });
     request
         .send()
         .then((response) => response.stream.bytesToString().then((value) {
-      _setSuccess(value, object);
-    }))
+              _setSuccess(value, object);
+            }))
         .catchError((error) {
       _setFailed(error.toString(), object);
     });
@@ -82,15 +86,21 @@ class Communication {
     );
   }
 
-  Get(String url, Map<String, String> param, Object object) async {
+  Get(String url, Map<String, String> param, Object object,
+      {showProgress = true, token = ""}) async {
+    _dialog.show(showProgress);
     var request = new http.Request("GET", Uri.parse(url));
     request.bodyFields = param;
-    request.headers.addAll({'api-key': 'WLJGDnxq9u5bvYjzurmo1N2q8ljDki84'});
+    request.headers.addAll({
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    });
     request
         .send()
         .then((response) => response.stream.bytesToString().then((value) {
-      _setSuccess(value, object);
-    }))
+              _setSuccess(value, object);
+            }))
         .catchError((error) {
       _setFailed(error.toString(), object);
     });
@@ -105,8 +115,8 @@ class Communication {
     request
         .send()
         .then((response) => response.stream.bytesToString().then((value) {
-      _setSuccess(value, object);
-    }))
+              _setSuccess(value, object);
+            }))
         .catchError((error) {
       _setFailed(error.toString(), object);
     });
@@ -124,8 +134,8 @@ class Communication {
     request
         .send()
         .then((response) => response.stream.bytesToString().then((value) {
-      _setSuccess(value, object);
-    }))
+              _setSuccess(value, object);
+            }))
         .catchError((error) {
       _setFailed(error.toString(), object);
     });
