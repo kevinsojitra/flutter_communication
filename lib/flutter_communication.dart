@@ -44,12 +44,12 @@ class Communication {
     _dialog.dismiss();
     listener.onCallBackSuccess(value, object);
     Map data = json.decode(value);
-    if (data["status"] == 'false') {
+    if (!data["success"]) {
       showDialog<void>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            content: Text(data['msg']),
+            content: Text(data['message']),
             actions: <Widget>[
               FlatButton(
                 child: Text('Ok'),
