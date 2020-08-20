@@ -1,6 +1,6 @@
 name: flutter_communication
 description: A new HTTP Simplify Library
-version: 0.0.2
+version: 0.0.3
 author: kevin Sojitra
 homepage: https://github.com/kevinsojitra/flutter_communication
 
@@ -12,8 +12,6 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.12.2
-  json_annotation: ^3.0.0
-  logger: any
 
 dev_dependencies:
   flutter_test:
