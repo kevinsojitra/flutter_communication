@@ -1,6 +1,5 @@
 library flutter_communication;
 
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -21,27 +20,7 @@ class Communication {
     _dialog = MyProgressDialog(context);
   }
 
-  @deprecated
-  Post(String url, Map<String, String> param, Object object,
-      {bool showProgress = true, String token = ""}) async {
-    _dialog.show(showProgress);
 
-    var request = new http.Request("POST", Uri.parse(url));
-    request.bodyFields = param;
-    request.headers.addAll({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
-    });
-    request
-        .send()
-        .then((response) => response.stream.bytesToString().then((value) {
-              _setSuccess(value, object);
-            }))
-        .catchError((error) {
-      _setFailed(request, error.toString(), object);
-    });
-  }
 
   post(String url, Object object,
       {Map<String, String> param,
@@ -149,29 +128,8 @@ class Communication {
     );
   }
 
-  @deprecated
-  Get(String url, Map<String, String> param, Object object,
-      {bool showProgress = true, String token = ""}) async {
-    _dialog.show(showProgress);
-    var request = new http.Request("GET", Uri.parse(url));
-    request.bodyFields = param;
-    request.headers.addAll({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
-    });
 
-    request
-        .send()
-        .then((response) => response.stream.bytesToString().then((value) {
-              _setSuccess(value, object);
-            }))
-        .catchError((error) {
-      _setFailed(request, error.toString(), object);
-    });
-  }
 
-  @deprecated
   get(String url, Object object,
       {Map<String, String> param,
       bool showProgress = true,
@@ -197,28 +155,7 @@ class Communication {
     });
   }
 
-  @deprecated
-  Part(String url, Map<String, String> param, File file, Object object,
-      {bool showProgress = true, String token = ""}) async {
-    _dialog.show(showProgress);
-    var request = new http.MultipartRequest("POST", Uri.parse(url));
-    request.fields.addAll(param);
-    request.headers.addAll({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
-    });
-    request.files.add(
-        new http.MultipartFile.fromBytes('file', await file.readAsBytes()));
-    request
-        .send()
-        .then((response) => response.stream.bytesToString().then((value) {
-              _setSuccess(value, object);
-            }))
-        .catchError((error) {
-      _setFailedMultiPart(request, error.toString(), object);
-    });
-  }
+
 
   part(String url, File file, Object object,
       {Map<String, String> param,
@@ -246,32 +183,7 @@ class Communication {
     });
   }
 
-  @deprecated
-  PartList(String url, Map<String, String> param, String key,
-      List<File> fileList, Object object,
-      {bool showProgress = true, String token = ""}) async {
-    _dialog.show(showProgress);
-    var request = new http.MultipartRequest("POST", Uri.parse(url));
-    request.headers.addAll({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
-    });
-    request.fields.addAll(param);
-    var i = 0;
-    for (File file in fileList) {
-      request.files.add(new http.MultipartFile.fromBytes(
-          key + '[${i}]', await file.readAsBytes()));
-    }
-    request
-        .send()
-        .then((response) => response.stream.bytesToString().then((value) {
-              _setSuccess(value, object);
-            }))
-        .catchError((error) {
-      _setFailedMultiPart(request, error.toString(), object);
-    });
-  }
+
 
   partList(String url, String key, List<File> fileList, Object object,
       {Map<String, String> param,
@@ -303,7 +215,7 @@ class Communication {
   }
 
   _retry(request, object) {
-    request
+    _copyRequest(request)
         .send()
         .then((response) => response.stream.bytesToString().then((value) {
               _setSuccess(value, object);
@@ -314,7 +226,7 @@ class Communication {
   }
 
   _retryMultiPart(request, object) {
-    request
+    _copyRequest(request)
         .send()
         .then((response) => response.stream.bytesToString().then((value) {
               _setSuccess(value, object);
@@ -322,6 +234,35 @@ class Communication {
         .catchError((error) {
       _setFailed(request, error.toString(), object);
     });
+  }
+
+  http.BaseRequest _copyRequest(http.BaseRequest request) {
+    http.BaseRequest requestCopy;
+
+    if(request is http.Request) {
+      requestCopy = http.Request(request.method, request.url)
+        ..encoding = request.encoding
+        ..bodyBytes = request.bodyBytes;
+    }
+    else if(request is http.MultipartRequest) {
+      requestCopy = http.MultipartRequest(request.method, request.url)
+        ..fields.addAll(request.fields)
+        ..files.addAll(request.files);
+    }
+    else if(request is http.StreamedRequest) {
+      throw Exception('copying streamed requests is not supported');
+    }
+    else {
+      throw Exception('request type is unknown, cannot copy');
+    }
+
+    requestCopy
+      ..persistentConnection = request.persistentConnection
+      ..followRedirects = request.followRedirects
+      ..maxRedirects = request.maxRedirects
+      ..headers.addAll(request.headers);
+
+    return requestCopy;
   }
 
 /*Download(String url, File file) {
