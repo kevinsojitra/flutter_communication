@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
 
-class CustomDialog extends StatefulWidget {
-  Widget child;
+class CustomDialog extends StatelessWidget {
+  final Widget child;
 
-  CustomDialog(@required this.child);
+  CustomDialog(this.child);
 
-  @override
-  _CustomDialogState createState() => _CustomDialogState(child);
-}
-
-class _CustomDialogState extends State<CustomDialog> {
-  Widget child;
-
-  _CustomDialogState(this.child);
+ /* @override
+  _CustomDialogState createState() => _CustomDialogState(child);*/
 
   @override
   Widget build(BuildContext context) {
@@ -27,3 +21,14 @@ class _CustomDialogState extends State<CustomDialog> {
     );
   }
 }
+
+/*class _CustomDialogState extends State<CustomDialog> {
+  Widget child;
+
+  _CustomDialogState(this.child);
+
+  @override
+  Widget build(BuildContext context) {
+
+  }
+}*/
